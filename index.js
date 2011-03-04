@@ -10,8 +10,10 @@
  */
 
 var express = require('express')
+  , join = require('path').join
   , Server = express.Server
-  , join = require('path').join;
+    ? express.Server
+    : express.HTTPServer;
 
 /**
  * Namespace using the given `path`, providing a callback `fn()`,
