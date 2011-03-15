@@ -11,9 +11,8 @@
 
 var express = require('express')
   , join = require('path').join
-  , Server = express.Server
-    ? express.Server
-    : express.HTTPServer;
+  , HTTPServer = express.HTTPServer
+  , HTTPSServer = express.HTTPSServer;
 
 /**
  * Namespace using the given `path`, providing a callback `fn()`,
@@ -25,7 +24,7 @@ var express = require('express')
  * @api public
  */
 
-Server.prototype.namespace = function(path, fn){
+exports.namespace = function(path, fn){
   (this._ns = this._ns || []).push(path);
   fn.call(this);
   this._ns.pop();
@@ -39,7 +38,7 @@ Server.prototype.namespace = function(path, fn){
  * @api public
  */
 
-Server.prototype.__defineGetter__('currentNamespace', function(){
+exports.__defineGetter__('currentNamespace', function(){
   return join.apply(this, this._ns).replace(/\/$/, '') || '/';
 });
 
@@ -48,8 +47,8 @@ Server.prototype.__defineGetter__('currentNamespace', function(){
  */
 
 express.router.methods.concat(['del', 'all']).forEach(function(method){
-  var orig = Server.prototype[method];
-  Server.prototype[method] = function(){
+  var orig = HTTPServer.prototype[method];
+  exports[method] = function(){
     var args = Array.prototype.slice.call(arguments)
       , path = args.shift()
       , fn = args.pop()
@@ -69,3 +68,11 @@ express.router.methods.concat(['del', 'all']).forEach(function(method){
     return this;
   };
 });
+
+// merge
+
+for (var key in exports) {
+  var desc = Object.getOwnPropertyDescriptor(exports, key);
+  Object.defineProperty(HTTPServer.prototype, key, desc);
+  Object.defineProperty(HTTPSServer.prototype, key, desc);
+}
