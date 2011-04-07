@@ -4,10 +4,11 @@
  */
 
 var express = require('express')
+  , assert = require('assert')
   , namespace = require('../');
 
 module.exports = {
-  'test app.namespace(str, fn)': function(assert){
+  'test app.namespace(str, fn)': function(){
     var app = express.createServer();
 
     app.get('/one', function(req, res){
@@ -47,7 +48,7 @@ module.exports = {
       { body: 'GET two' });
   },
   
-  'test app.namespace(str, fn) nesting': function(assert, done){
+  'test app.namespace(str, fn) nesting': function(done){
     var pending = 6
       , calls = 0
       , app = express.createServer();
@@ -123,7 +124,7 @@ module.exports = {
       , finished);
   },
   
-  'test fn.route': function(assert){
+  'test fn.route': function(){
     var app = express.createServer();
 
     app.namespace('/user/:id', function(){
