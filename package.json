@@ -1,11 +1,11 @@
 {   "name": "express-namespace"
   , "description": "Express namespaced routes extension"
-  , "version": "0.0.3"
+  , "version": "0.0.4"
   , "author": "TJ Holowaychuk <tj@vision-media.ca>"
   , "keywords": ["express"]
   , "main": "index"
   , "devDependencies": {
-      "express": ">= 0.0.1"
+      "express": "0.2.x"
     , "ejs": ">= 0.0.1"
     , "expresso": ">= 0.0.1"
   }
