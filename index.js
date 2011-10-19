@@ -46,7 +46,7 @@ exports.__defineGetter__('currentNamespace', function(){
  * Proxy HTTP methods to provide namespacing support.
  */
 
-express.router.methods.concat(['del', 'all']).forEach(function(method){
+express.router.methods.concat(['del']).forEach(function(method){
   var orig = HTTPServer.prototype[method];
   exports[method] = function(){
     var args = Array.prototype.slice.call(arguments)

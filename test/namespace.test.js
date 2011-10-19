@@ -9,7 +9,8 @@ var express = require('express')
 
 module.exports = {
   'test app.namespace(str, fn)': function(){
-    var app = express.createServer();
+    var app = express.createServer()
+      , id;
 
     app.get('/one', function(req, res){
       res.send('GET one');
@@ -18,12 +19,17 @@ module.exports = {
     assert.equal(app.namespace('/user', function(){}), app);
 
     app.namespace('/user', function(){
+      app.all('/:id', function(req, res, next){
+        id = req.params.id;
+        next();
+      });
+
       app.get('/:id', function(req, res){
-        res.send('GET user ' + req.params.id);
+        res.send('GET user ' + id);
       });
       
       app.del('/:id', function(req, res){
-        res.send('DELETE user ' + req.params.id);
+        res.send('DELETE user ' + id);
       });
     });
     
