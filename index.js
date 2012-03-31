@@ -1,4 +1,3 @@
-
 /*!
  * Express - Contrib - namespace
  * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
@@ -39,7 +38,7 @@ exports.namespace = function(path, fn){
  */
 
 exports.__defineGetter__('currentNamespace', function(){
-  return join.apply(this, this._ns).replace(/\/$/, '') || '/';
+  return join.apply(this, this._ns).replace(/\\/g, '/').replace(/\/$/, '') || '/';
 });
 
 /**
