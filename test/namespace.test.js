@@ -152,23 +152,28 @@ module.exports = {
       calledA++;
       next();
     }
+
     function middlewareB(req,res,next){
       calledB++;
       next();
     }
+
     app.namespace('/user/:id', middlewareA, function(){
       app.get('/', function(req,res){
         res.send('got Home');
       });
+
       app.get('/other', function(req,res){
         res.send('got Other');
       });
+
       app.namespace('/nest', middlewareB, function(req,res){
         app.get('/', function(req,res){
           res.send('got Nest');
         });
       });
     });
+
     var pending = 3;
     function finished() {
       --pending || function(){
@@ -177,6 +182,7 @@ module.exports = {
         done();
       }();
     }
+
     assert.response(app,
       { url: '/user/12' },
       { body: 'got Home' }, 
