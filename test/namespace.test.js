@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -143,5 +142,52 @@ module.exports = {
     assert.response(app,
       { url: '/user/12' },
       { body: 'OK' });
+  },
+  'test app.namespace(str, middleware, fn)': function(done){
+    var app = express.createServer(),
+        calledA = 0,
+        calledB = 0;
+    
+    function middlewareA(req,res,next){
+      calledA++;
+      next();
+    }
+    function middlewareB(req,res,next){
+      calledB++;
+      next();
+    }
+    app.namespace('/user/:id', middlewareA, function(){
+      app.get('/', function(req,res){
+        res.send('got Home');
+      });
+      app.get('/other', function(req,res){
+        res.send('got Other');
+      });
+      app.namespace('/nest', middlewareB, function(req,res){
+        app.get('/', function(req,res){
+          res.send('got Nest');
+        });
+      });
+    });
+    var pending = 3;
+    function finished() {
+      --pending || function(){
+        assert.equal(3, calledA);
+        assert.equal(1, calledB);
+        done();
+      }();
+    }
+    assert.response(app,
+      { url: '/user/12' },
+      { body: 'got Home' }, 
+      finished);
+    assert.response(app,
+      { url: '/user/12/other' },
+      { body: 'got Other' },
+      finished);
+    assert.response(app,
+      { url: '/user/12/nest' },
+      { body: 'got Nest' },
+      finished);
   }
 };

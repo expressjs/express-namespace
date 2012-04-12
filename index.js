@@ -23,8 +23,17 @@ var express = require('express')
  * @api public
  */
 
-exports.namespace = function(path, fn){
+exports.namespace = function(){
+  var args = Array.prototype.slice.call(arguments)
+    , path = args.shift()
+    , fn = args.pop()
+    , self = this;
   (this._ns = this._ns || []).push(path);
+  
+  if(args.length){
+    self.all('/*', args);
+  }
+  
   fn.call(this);
   this._ns.pop();
   return this;
