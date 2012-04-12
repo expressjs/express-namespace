@@ -23,8 +23,17 @@ var express = require('express')
  * @api public
  */
 
-exports.namespace = function(path, fn){
+exports.namespace = function(){
+  var args = Array.prototype.slice.call(arguments)
+    , path = args.shift()
+    , fn = args.pop()
+    , self = this;
   (this._ns = this._ns || []).push(path);
+  
+  if(args.length){
+    self.all('/*', args);
+  }
+  
   fn.call(this);
   this._ns.pop();
   return this;
@@ -52,7 +61,7 @@ express.router.methods.concat(['del']).forEach(function(method){
       , path = args.shift()
       , fn = args.pop()
       , self = this;
-
+    var middleware = this._ns_middleware;
     this.namespace(path, function(){
       var curr = this.currentNamespace;
       args.forEach(function(fn){
