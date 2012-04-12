@@ -61,7 +61,7 @@ express.router.methods.concat(['del']).forEach(function(method){
       , path = args.shift()
       , fn = args.pop()
       , self = this;
-    var middleware = this._ns_middleware;
+
     this.namespace(path, function(){
       var curr = this.currentNamespace;
       args.forEach(function(fn){
