@@ -24,11 +24,12 @@ var express = require('express')
  */
 
 exports.namespace = function(){
-  var args = Array.prototype.slice.call(arguments)
+  var args = Array.apply(null, arguments)
     , path = args.shift()
     , fn = args.pop()
     , self = this;
-  if(args.length) self.all(path + '*', args);
+
+  if (args.length) self.all(path + '*', args);
   (this._ns = this._ns || []).push(path);
   fn.call(this);
   this._ns.pop();
