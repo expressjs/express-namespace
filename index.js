@@ -28,7 +28,7 @@ exports.namespace = function(){
     , path = args.shift()
     , fn = args.pop()
     , self = this;
-  self.all(path + '*', args);
+  if(args.length) self.all(path + '*', args);
   (this._ns = this._ns || []).push(path);
   fn.call(this);
   this._ns.pop();
