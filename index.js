@@ -28,12 +28,8 @@ exports.namespace = function(){
     , path = args.shift()
     , fn = args.pop()
     , self = this;
+  self.all(path + '*', args);
   (this._ns = this._ns || []).push(path);
-  
-  if(args.length){
-    self.all('/*', args);
-  }
-  
   fn.call(this);
   this._ns.pop();
   return this;
