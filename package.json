@@ -5,7 +5,7 @@
   , "keywords": ["express"]
   , "main": "index"
   , "devDependencies": {
-      "express": "2.5.x"
+      "express": "3.x"
     , "ejs": ">= 0.0.1"
     , "expresso": ">= 0.0.1"
   }

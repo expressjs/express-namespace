@@ -8,7 +8,7 @@ var express = require('express')
 
 module.exports = {
   'test app.namespace(str, fn)': function(){
-    var app = express.createServer()
+    var app = express()
       , id;
 
     app.get('/one', function(req, res){
@@ -56,7 +56,7 @@ module.exports = {
   'test app.namespace(str, fn) nesting': function(done){
     var pending = 6
       , calls = 0
-      , app = express.createServer();
+      , app = express();
     
     function finished() {
       --pending || function(){
@@ -130,7 +130,7 @@ module.exports = {
   },
   
   'test fn.route': function(){
-    var app = express.createServer();
+    var app = express();
 
     app.namespace('/user/:id', function(){
       app.get('/', function handler(req, res){
@@ -144,7 +144,7 @@ module.exports = {
       { body: 'OK' });
   },
   'test app.namespace(str, middleware, fn)': function(done){
-    var app = express.createServer(),
+    var app = express(),
         calledA = 0,
         calledB = 0;
     
