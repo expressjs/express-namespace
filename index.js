@@ -9,7 +9,10 @@
  */
 
 var express = require('express')
-  , join = require('path').join;
+  , join = require('path').join
+  , app = express.application
+    ? express.application
+    : express.HTTPServer.prototype;
 
 /**
  * Namespace using the given `path`, providing a callback `fn()`,
@@ -50,7 +53,7 @@ exports.__defineGetter__('currentNamespace', function(){
  */
 
 (express.router || express.Router).methods.concat('del').forEach(function(method){
-  var orig = express.application[method];
+  var orig = app[method];
   exports[method] = function(){
     var args = Array.prototype.slice.call(arguments)
       , path = args.shift()
@@ -76,6 +79,6 @@ exports.__defineGetter__('currentNamespace', function(){
 
 for (var key in exports) {
   var desc = Object.getOwnPropertyDescriptor(exports, key);
-  Object.defineProperty(express.application, key, desc);
-  Object.defineProperty(express.application, key, desc);
+  Object.defineProperty(app, key, desc);
+  Object.defineProperty(app, key, desc);
 }
