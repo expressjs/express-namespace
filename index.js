@@ -9,9 +9,7 @@
  */
 
 var express = require('express')
-  , join = require('path').join
-  , HTTPServer = express.HTTPServer
-  , HTTPSServer = express.HTTPSServer;
+  , join = require('path').join;
 
 /**
  * Namespace using the given `path`, providing a callback `fn()`,
@@ -51,8 +49,8 @@ exports.__defineGetter__('currentNamespace', function(){
  * Proxy HTTP methods to provide namespacing support.
  */
 
-express.router.methods.concat('del').forEach(function(method){
-  var orig = HTTPServer.prototype[method];
+(express.router || express.Router).methods.concat('del').forEach(function(method){
+  var orig = express.application[method];
   exports[method] = function(){
     var args = Array.prototype.slice.call(arguments)
       , path = args.shift()
@@ -78,6 +76,6 @@ express.router.methods.concat('del').forEach(function(method){
 
 for (var key in exports) {
   var desc = Object.getOwnPropertyDescriptor(exports, key);
-  Object.defineProperty(HTTPServer.prototype, key, desc);
-  Object.defineProperty(HTTPSServer.prototype, key, desc);
+  Object.defineProperty(express.application, key, desc);
+  Object.defineProperty(express.application, key, desc);
 }
