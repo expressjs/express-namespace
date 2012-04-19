@@ -55,7 +55,7 @@ exports.__defineGetter__('currentNamespace', function(){
 (express.router || express.Router).methods.concat('del').forEach(function(method){
   var orig = app[method];
   exports[method] = function(){
-    var args = Array.prototype.slice.call(arguments)
+    var args = Array.apply(null, arguments)
       , path = args.shift()
       , fn = args.pop()
       , self = this;
