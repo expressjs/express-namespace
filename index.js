@@ -1,15 +1,10 @@
-/*!
- * Express - Contrib - namespace
- * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
- * MIT Licensed
- */
 
 /**
  * Module dependencies.
  */
 
 var express = require('express')
-  , join = require('path').join
+  , methods = require('methods').concat('del')
   , app = express.application
     ? express.application
     : express.HTTPServer.prototype;
@@ -24,13 +19,14 @@ var express = require('express')
  * @api public
  */
 
-exports.namespace = function(){
-  var args = Array.apply(null, arguments)
+app.namespace = function(){
+  var args = Array.prototype.slice.call(arguments)
     , path = args.shift()
     , fn = args.pop()
     , self = this;
 
-  if (args.length) self.all(path + '*', args);
+  if (args.length) self.all(path, args);
+  if (args.length) self.all(path + '/*', args);
   (this._ns = this._ns || []).push(path);
   fn.call(this);
   this._ns.pop();
@@ -38,47 +34,26 @@ exports.namespace = function(){
 };
 
 /**
- * Return the current namespace.
- *
- * @return {String}
- * @api public
- */
-
-exports.__defineGetter__('currentNamespace', function(){
-  return join.apply(this, this._ns).replace(/\\/g, '/').replace(/\/$/, '') || '/';
-});
-
-/**
  * Proxy HTTP methods to provide namespacing support.
  */
 
-(express.router || express.Router).methods.concat('del').forEach(function(method){
+methods.forEach(function(method){
   var orig = app[method];
-  exports[method] = function(){
+  app[method] = function(val){
+    var len = arguments.length;
+    if ('get' == method && 1 == len) return orig.call(this, val);
+
     var args = Array.prototype.slice.call(arguments)
       , path = args.shift()
-      , fn = args.pop()
       , self = this;
 
     this.namespace(path, function(){
-      var curr = this.currentNamespace;
+      path = this._ns.join('/').replace(/\/\//g, '/').replace(/\/$/, '');
       args.forEach(function(fn){
-        fn.namespace = curr;
-        orig.call(self, curr, fn);
+        orig.call(self, path, fn);
       });
-
-      fn.namespace = curr;
-      orig.call(self, curr, fn);
     });
 
     return this;
   };
 });
-
-// merge
-
-for (var key in exports) {
-  var desc = Object.getOwnPropertyDescriptor(exports, key);
-  Object.defineProperty(app, key, desc);
-  Object.defineProperty(app, key, desc);
-}

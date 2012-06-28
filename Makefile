@@ -1,5 +1,6 @@
 
 test:
-	@./node_modules/.bin/expresso --serial
+	@./node_modules/.bin/mocha \
+		--reporter spec
 
 .PHONY: test

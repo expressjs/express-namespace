@@ -1,199 +1,109 @@
+
 /**
  * Module dependencies.
  */
 
 var express = require('express')
   , assert = require('assert')
-  , namespace = require('../');
+  , request = require('supertest')
+  , namespace = require('..')
+  , pending = require('./support/pending');
 
-module.exports = {
-  'test app.namespace(str, fn)': function(){
-    var app = express()
-      , id;
+describe('app.namespace(path, fn)', function(){
+  it('should not prefix root-level paths', function(done){
+    var app = express();
+    done = pending(2, done);
 
     app.get('/one', function(req, res){
       res.send('GET one');
     });
 
-    assert.equal(app.namespace('/user', function(){}), app);
-
-    app.namespace('/user', function(){
-      app.all('/:id', function(req, res, next){
-        id = req.params.id;
-        next();
-      });
-
-      app.get('/:id', function(req, res){
-        res.send('GET user ' + id);
-      });
-      
-      app.del('/:id', function(req, res){
-        res.send('DELETE user ' + id);
-      });
-    });
-    
-    app.get('/two', function(req, res){
+    app.get('/some/two', function(req, res){
       res.send('GET two');
     });
 
-    assert.response(app,
-      { url: '/user/12' },
-      { body: 'GET user 12' });
-  
-    assert.response(app,
-      { url: '/user/12', method: 'DELETE' },
-      { body: 'DELETE user 12' });
-    
-    assert.response(app,
-      { url: '/one' },
-      { body: 'GET one' });
-    
-    assert.response(app,
-      { url: '/two' },
-      { body: 'GET two' });
-  },
-  
-  'test app.namespace(str, fn) nesting': function(done){
-    var pending = 6
-      , calls = 0
-      , app = express();
-    
-    function finished() {
-      --pending || function(){
-        assert.equal(2, calls);
-        done();
-      }();
-    }
+    request(app)
+    .get('/one')
+    .expect('GET one', done);
 
-    function middleware(req, res, next) {
-      ++calls;
-      next();
-    }
+    request(app)
+    .get('/some/two')
+    .expect('GET two', done);
+  })
+
+  it('should prefix within .namespace()', function(done){
+    var app = express();
+    done = pending(4, done);
 
     app.get('/one', function(req, res){
       res.send('GET one');
     });
 
-    app.namespace('/forum/:id', function(){
+    app.namespace('/foo', function(){
       app.get('/', function(req, res){
-        res.send('GET forum ' + req.params.id);
-      });
-      
-      app.get('/edit', function(req, res){
-        res.send('GET forum ' + req.params.id + ' edit page');
+        res.send('foo');
       });
 
-      app.namespace('/thread', function(){
-        app.get('/:tid', middleware, middleware, function(req, res){
-          res.send('GET forum ' + req.params.id + ' thread ' + req.params.tid);
+      app.namespace('/baz', function(){
+        app.get('/', function(req, res){
+          res.send('GET baz');
         });
-      });
 
-      app.del('/', function(req, res){
-        res.send('DELETE forum ' + req.params.id);
+        app.del('/all', function(req, res){
+          res.send('DELETE all baz');
+        });
+      })
+
+      app.get('/bar', function(req, res){
+        res.send('bar');
       });
-    });
-    
-    app.get('/two', function(req, res){
+    })
+
+    app.get('/some/two', function(req, res){
       res.send('GET two');
     });
 
-    assert.response(app,
-      { url: '/forum/1' },
-      { body: 'GET forum 1' }
-      , finished);
-    
-    assert.response(app,
-      { url: '/forum/1/edit' },
-      { body: 'GET forum 1 edit page' }
-      , finished);
-    
-    assert.response(app,
-      { url: '/forum/1/thread/50' },
-      { body: 'GET forum 1 thread 50' }
-      , finished);
-  
-    assert.response(app,
-      { url: '/forum/2', method: 'DELETE' },
-      { body: 'DELETE forum 2' }
-      , finished);
-    
-    assert.response(app,
-      { url: '/one' },
-      { body: 'GET one' }
-      , finished);
-    
-    assert.response(app,
-      { url: '/two' },
-      { body: 'GET two' }
-      , finished);
-  },
-  
-  'test fn.route': function(){
+    request(app)
+    .get('/foo/baz')
+    .expect('GET baz', done);
+
+    request(app)
+    .del('/foo/baz/all')
+    .expect('DELETE all baz', done);
+
+    request(app)
+    .get('/one')
+    .expect('GET one', done);
+
+    request(app)
+    .get('/some/two')
+    .expect('GET two', done);
+
+    request(app)
+    .get('/foo')
+    .expect('foo', done);
+
+    request(app)
+    .get('/foo/bar')
+    .expect('bar', done);
+  })
+
+  it('should support middleware', function(done){
     var app = express();
 
-    app.namespace('/user/:id', function(){
-      app.get('/', function handler(req, res){
-        assert.equal('/user/:id', handler.namespace);
-        res.send(200);
-      });
-    });
-
-    assert.response(app,
-      { url: '/user/12' },
-      { body: 'OK' });
-  },
-  'test app.namespace(str, middleware, fn)': function(done){
-    var app = express(),
-        calledA = 0,
-        calledB = 0;
-    
-    function middlewareA(req,res,next){
-      calledA++;
+    function load(req, res, next) {
+      req.forum = { id: req.params.id };
       next();
     }
 
-    function middlewareB(req,res,next){
-      calledB++;
-      next();
-    }
-
-    app.namespace('/user/:id', middlewareA, function(){
-      app.get('/', function(req,res){
-        res.send('got Home');
-      });
-
-      app.get('/other', function(req,res){
-        res.send('got Other');
-      });
-
-      app.namespace('/nest', middlewareB, function(req,res){
-        app.get('/', function(req,res){
-          res.send('got Nest');
-        });
+    app.namespace('/forum/:id', load, function(){
+      app.get('/', function(req, res){
+        res.send('' + req.forum.id);
       });
     });
 
-    var pending = 3;
-    function finished() {
-      --pending || function(){
-        assert.equal(3, calledA);
-        assert.equal(1, calledB);
-        done();
-      }();
-    }
-
-    assert.response(app,
-      { url: '/user/12' },
-      { body: 'got Home' }, 
-      finished);
-    assert.response(app,
-      { url: '/user/12/other' },
-      { body: 'got Other' },
-      finished);
-    assert.response(app,
-      { url: '/user/12/nest' },
-      { body: 'got Nest' },
-      finished);
-  }
-};
+    request(app)
+    .get('/forum/23')
+    .expect('23', done);
+  })
+})

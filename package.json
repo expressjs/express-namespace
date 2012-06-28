@@ -4,9 +4,13 @@
   , "author": "TJ Holowaychuk <tj@vision-media.ca>"
   , "keywords": ["express"]
   , "main": "index"
+  , "dependencies": {
+    "methods": "0.0.1"
+  }
   , "devDependencies": {
       "express": "3.x"
-    , "ejs": ">= 0.0.1"
-    , "expresso": ">= 0.0.1"
+    , "ejs": "*"
+    , "mocha": "*"
+    , "supertest": "*"
   }
 }
