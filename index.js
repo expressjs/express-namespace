@@ -5,9 +5,9 @@
 
 var express = require('express')
   , methods = require('methods').concat('del')
-  , app = express.application
-    ? express.application
-    : express.HTTPServer.prototype;
+  , apps = express.application
+    ? [express.application]
+    : [express.HTTPServer.prototype, express.HTTPSServer.prototype];
 
 /**
  * Namespace using the given `path`, providing a callback `fn()`,
@@ -19,7 +19,7 @@ var express = require('express')
  * @api public
  */
 
-app.namespace = function(){
+var namespace = exports.namespace = function(){
   var args = Array.prototype.slice.call(arguments)
     , path = args.shift()
     , fn = args.pop()
@@ -33,27 +33,33 @@ app.namespace = function(){
   return this;
 };
 
+apps.forEach(function(app){
+  app.namespace = namespace;
+});
+
 /**
  * Proxy HTTP methods to provide namespacing support.
  */
 
 methods.forEach(function(method){
-  var orig = app[method];
-  app[method] = function(val){
-    var len = arguments.length;
-    if ('get' == method && 1 == len) return orig.call(this, val);
+  apps.forEach(function(app){
+    var orig = app[method];
+    app[method] = function(val){
+      var len = arguments.length;
+      if ('get' == method && 1 == len) return orig.call(this, val);
 
-    var args = Array.prototype.slice.call(arguments)
-      , path = args.shift()
-      , self = this;
+      var args = Array.prototype.slice.call(arguments)
+        , path = args.shift()
+        , self = this;
 
-    this.namespace(path, function(){
-      path = this._ns.join('/').replace(/\/\//g, '/').replace(/\/$/, '');
-      args.forEach(function(fn){
-        orig.call(self, path, fn);
+      this.namespace(path, function(){
+        path = this._ns.join('/').replace(/\/\//g, '/').replace(/\/$/, '') || '/';
+        args.forEach(function(fn){
+          orig.call(self, path, fn);
+        });
       });
-    });
 
-    return this;
-  };
+      return this;
+    };
+  });
 });
