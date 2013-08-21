@@ -1,16 +1,23 @@
-{   "name": "express-namespace"
-  , "description": "Express namespaced routes extension"
-  , "version": "0.1.1"
-  , "author": "TJ Holowaychuk <tj@vision-media.ca>"
-  , "keywords": ["express"]
-  , "main": "index"
-  , "dependencies": {
-    "methods": "0.0.1"
-  }
-  , "devDependencies": {
-      "express": "3.x"
-    , "ejs": "*"
-    , "mocha": "*"
-    , "supertest": "*"
-  }
+{
+    "name": "express-namespace",
+    "description": "Express namespaced routes extension",
+    "version": "0.1.1",
+    "author": "TJ Holowaychuk <tj@vision-media.ca>",
+    "keywords": [
+        "express"
+    ],
+    "main": "index",
+    "dependencies": {
+        "methods": "0.0.1"
+    },
+    "devDependencies": {
+        "express": "3.x",
+        "ejs": "*",
+        "mocha": "*",
+        "supertest": "*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/visionmedia/express-namespace.git"
+    }
 }
