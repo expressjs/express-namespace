@@ -1,3 +1,10 @@
+# This Project Is Dead!
+
+Please use express 4's native [Router](http://expressjs.com/4x/api.html#router) instead. (See [this post](http://bulkan-evcimen.com/using_express_router_instead_of_express_namespace.html) for an example.)
+
+
+--
+
 
 # Express Contrib
       
