@@ -1,9 +1,8 @@
-# This Project Is Dead!
-
-Please use express 4's native [Router](http://expressjs.com/4x/api.html#router) instead. (See [this post](http://bulkan-evcimen.com/using_express_router_instead_of_express_namespace.html) for an example.)
-
-
---
+> [!CAUTION]
+> **This repository is archived and no longer actively maintained.**
+>
+> We are no longer accepting issues, feature requests, or pull requests.
+> For additional support or questions, please visit the [Express.js Discussions page](https://github.com/expressjs/express/discussions).
 
 
 # Express Contrib
